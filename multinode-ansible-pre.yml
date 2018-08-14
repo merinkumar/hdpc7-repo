@@ -1,0 +1,90 @@
+---
+- hosts: hdp
+  tasks:
+  - name: create java directory for mysql conector
+    file:
+      path: /usr/share/java
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: hugepage_defrag
+    lineinfile:
+      dest: /etc/rc.local
+      state: present
+      line: 'echo "never" > /sys/kernel/mm/transparent_hugepage/defrag'
+  - name: hugepage_enabled
+    lineinfile:
+      dest: /etc/rc.local
+      state: present
+      line: 'echo "never" > /sys/kernel/mm/transparent_hugepage/enabled'
+  - name: set swappiness 10
+    lineinfile:
+      dest: /etc/sysctl.conf
+      state: present
+      line: 'vm.swappiness = 10'
+  - name: make rc.local executable
+    file:
+      path: /etc/rc.d/rc.local
+      mode: "u+x"
+  - name: Install libselinux as prerequisite for SELinux Ansible module
+    yum:
+      name: "{{item}}"
+      state: latest
+    with_items:
+      - libselinux-python
+      - libsemanage-python
+      - wget
+  - name: Disable SELinux at next reboot
+    selinux:
+      state: disabled
+  - name: Set SELinux in permissive mode until the machine is rebooted
+    command: setenforce 0
+    ignore_errors: true
+    changed_when: false
+  - name: be sure firewalld is installed
+    yum:
+      name: "{{item}}"
+      state: latest
+    with_items:
+      - firewalld
+  - name: be sure firewalld is disabled
+    systemd: name=firewalld enabled=no
+    tags:
+     - install
+     - atomic
+     - firewalld
+  - name: be sure firewalld is stopped
+    systemd: name=firewalld state=stopped
+    ignore_errors: yes
+    tags:
+     - install
+     - atomic
+     - firewalld
+  - name: setting hots file correct
+    copy:
+      src: /etc/hosts
+      dest: /etc/hosts
+      owner: root
+      group: root
+      mode: 0644
+  - name: Install NTP
+    yum:
+      name: ntp
+      state: latest
+  - name: reboot host
+    shell: sleep 10 && /sbin/shutdown -r now
+    async: 30
+    poll: 0
+    become: true
+  - name: waiting for server booting up
+    local_action: wait_for
+    args:
+      host: "{{ inventory_hostname }}"
+      port: 22
+      delay: 30
+      timeout: 60
+      state: started
+    become: false
+...

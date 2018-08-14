@@ -1,0 +1,8 @@
+---
+- hosts: hdp
+  tasks:
+  - name: Install NTP
+    yum:
+      name: ntp
+      state: latest
+...

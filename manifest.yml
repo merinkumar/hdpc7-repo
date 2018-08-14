@@ -1,0 +1,7 @@
+---
+  instances: 6
+  name_prefix: hdp00 
+  memory: 5120
+  cpus: 2
+  privateip_prefix: 192.168.20.2
+  bootstrap: bootstrap.sh

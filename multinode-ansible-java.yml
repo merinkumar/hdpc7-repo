@@ -1,0 +1,36 @@
+---
+- hosts: hdp
+  tasks:
+  - name: create directories for java
+    file:
+      path: /usr/java
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: Unarchive java binaries
+    unarchive:
+      src: http://master/java/jdk-8u181-linux-x64.tar.gz
+      dest: /usr/java
+      remote_src: yes
+      owner: root
+      group: root
+
+  - name: configure jar's
+    command: 'alternatives --install /usr/bin/jar jar  /usr/java/jdk1.8.0_181/bin/jar 2'
+ 
+  - name: configure java's
+    command: 'alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_181/bin/java 2'
+ 
+  - name: configure javac's
+    command: 'alternatives --install /usr/bin/javac javac /usr/java/jdk1.8.0_181/bin/javac 2'
+  
+  - name: set jar
+    command: 'alternatives --set jar  /usr/java/jdk1.8.0_181/bin/jar'
+ 
+  - name: set java
+    command: 'alternatives --set java /usr/java/jdk1.8.0_181/bin/java'
+ 
+  - name: set javac
+    command: 'alternatives --set javac /usr/java/jdk1.8.0_181/bin/javac'

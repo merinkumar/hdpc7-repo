@@ -1,0 +1,28 @@
+[hdp]
+hdp000 ansible_user=root
+hdp001 ansible_user=root
+hdp002 ansible_user=root
+hdp003 ansible_user=root
+hdp004 ansible_user=root
+hdp005 ansible_user=root
+
+[hdpambari]
+hdp005 ansible_user=root
+
+[hdpnamenode]
+hdp000 ansible_user=root
+ 
+[hdptest]
+hdp005 ansible_user=root
+
+[hdpsecondarynamenode]
+hdp001 ansible_user=root
+
+[hdpresourcemanager]
+hdp001 ansible_user=root
+
+[hdpworkers]
+hdp003 ansible_user=root
+hdp002 ansible_user=root
+hdp004 ansible_user=root
+hdp005 ansible_user=root
